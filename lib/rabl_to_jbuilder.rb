@@ -22,6 +22,7 @@ module RablToJbuilder
 
     match = root_node / Sexp.s(:call, nil, :object, Sexp._)
     object = match && match[0][3]
+    pp object
 
     transformer = Transformer.new(object)
     converted = transformer.process(root_node)

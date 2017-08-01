@@ -41,18 +41,33 @@ module RablToJbuilder
         child = exp[1]
         block = exp[3]
 
-        attribute = child[3][1].to_s #FIXME
-        key = attribute #FIXME
-        if plural?(key)
-          args = s(:args, :quux)
+        key, attribute = nil, nil
 
-          block = Transformer.new(s(:lvar, :quux)).process(block)
+        if child[3][0] == :lit
+          key = child[3][1]
+          attribute = s(:call, @object, key)
+        elsif child[3][0] == :hash
+          _, attribute, key = child[3][1]
+          if attribute[0] == :lit
+            attribute = s(:call, @object, attribute[1])
+          end
         else
-          args = 0
-          block = Transformer.new(s(:call, @object, attribute)).process(block)
+          raise "wtf"
         end
 
-        s(:iter, s(:call, json, child[3][1]), args, block)
+        if plural?(key)
+          singular_key = key.to_s.singularize.to_sym
+          args = s(:args, singular_key)
+
+          block = Transformer.new(s(:lvar, singular_key)).process(block)
+
+          s(:iter, s(:call, json, key, attribute), args, block)
+        else
+          args = 0
+          block = Transformer.new(attribute).process(block)
+
+          s(:iter, s(:call, json, key), args, block)
+        end
       else
         exp
       end
@@ -61,6 +76,7 @@ module RablToJbuilder
     private
 
     def plural?(s)
+      s = s.to_s
       s.pluralize == s
     end
   end
@@ -74,6 +90,7 @@ module RablToJbuilder
 
         if args[0] == :args
           block = block.gsub(s(:lvar, :post), @object)
+        elsif args == 0
         else
           raise "wat?"
         end
