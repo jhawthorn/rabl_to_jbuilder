@@ -1,5 +1,6 @@
 require "sexp_processor"
 require "composite_sexp_processor"
+require "active_support/inflector"
 
 module RablToJbuilder
   class Transformer < CompositeSexpProcessor
@@ -20,7 +21,6 @@ module RablToJbuilder
     def initialize(object)
       super()
       @object = object
-      @debug.update(iter: true, call: true)
     end
 
     private
@@ -38,10 +38,30 @@ module RablToJbuilder
   class ChildTransformer < Base
     def rewrite_iter(exp)
       if exp[1][0..2] == s(:call, nil, :child)
-        exp # FIXME
+        child = exp[1]
+        block = exp[3]
+
+        attribute = child[3][1].to_s #FIXME
+        key = attribute #FIXME
+        if plural?(key)
+          args = s(:args, :quux)
+
+          block = Transformer.new(s(:lvar, :quux)).process(block)
+        else
+          args = 0
+          block = Transformer.new(s(:call, @object, attribute)).process(block)
+        end
+
+        s(:iter, s(:call, json, child[3][1]), args, block)
       else
         exp
       end
+    end
+
+    private
+
+    def plural?(s)
+      s.pluralize == s
     end
   end
 
@@ -52,10 +72,8 @@ module RablToJbuilder
         args = exp[2]
         block = exp[3]
 
-        p args
         if args[0] == :args
-          binding.pry
-          block = s(:block, s(:lasgn, args[1], @object), block)
+          block = block.gsub(s(:lvar, :post), @object)
         else
           raise "wat?"
         end
