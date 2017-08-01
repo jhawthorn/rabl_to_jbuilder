@@ -11,6 +11,16 @@ module RablToJbuilder
     root_node = parser.process(rabl)
     transformer = Transformer.new
 
+    puts
+    puts "rabl"
+    puts '='*20
+    pp rabl
+    puts
+    puts "sexp"
+    puts '='*20
+    pp root_node
+    puts
+
     ruby2ruby.process(transformer.process(root_node))
   end
 end

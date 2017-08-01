@@ -1,9 +1,62 @@
-require 'sexp_processor'
+require "sexp_processor"
+require "composite_sexp_processor"
 
 module RablToJbuilder
-  class Transformer < SexpProcessor
+  class Transformer < CompositeSexpProcessor
     def initialize
-      super
+      super()
+
+      self << IterTransformer.new
+      self << CallTransformer.new
+    end
+  end
+
+  module Helpers
+    private
+
+    def json
+      s(:lvar, :json)
+    end
+
+    def empty
+      # HACK!
+      s(:lvar, '')
+    end
+  end
+
+  class IterTransformer < SexpProcessor
+    include Helpers
+
+    def initialize
+      super()
+      @debug.update(iter: true, call: true)
+    end
+
+    def rewrite_iter(exp)
+      if exp[1][0..2] == s(:call, nil, :child)
+        exp # FIXME
+      else
+        exp
+      end
+    end
+  end
+
+  class CallTransformer < SexpProcessor
+    include Helpers
+
+    def initialize(object = nil)
+      super()
+
+      @object = object
+      @debug.update(iter: true, call: true)
+    end
+
+    def rewrite_iter(exp)
+      if exp[1][0..2] == s(:call, nil, :node)
+        s(exp[0], nil, exp[4])
+      else
+        exp
+      end
     end
 
     def rewrite_call(exp)
@@ -13,29 +66,17 @@ module RablToJbuilder
 
       if meth == :object
         @object = args[0]
-        return empty
+        empty
       elsif meth == :attributes
-        raise "called attributes before declaring `object` or `collection`" unless defined?(@object)
-        return s(:call, json, :extract!, @object, *args)
+        raise "called attributes before declaring `object` or `collection`" unless @object
+        s(:call, json, nil, @object, *args)
       elsif meth == :node
         raise unless args[0][0] == :lit
         key = args[0][1]
-        return s(:call, json, key)
+        s(:call, json, key)
+      else
+        exp
       end
-
-      p exp
-      exp
-    end
-
-    private
-
-    def json
-      s(:lvar, :json)
-    end
-
-    def empty
-      # hack!
-      s(:lvar, '')
     end
   end
 end
