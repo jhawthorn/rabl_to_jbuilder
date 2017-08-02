@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+$:.unshift(File.expand_path("../lib", __dir__))
+
+require 'rabl_to_jbuilder/cli'
