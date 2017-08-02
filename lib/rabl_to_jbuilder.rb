@@ -10,19 +10,8 @@ module RablToJbuilder
     ruby2ruby = Ruby2Ruby.new
     root_node = parser.process(rabl)
 
-    puts
-    puts "rabl"
-    puts '='*20
-    pp rabl
-    puts
-    puts "sexp"
-    puts '='*20
-    pp root_node
-    puts
-
     match = root_node / Sexp.s(:call, nil, :object, Sexp._)
     object = match && match[0][3]
-    pp object
 
     transformer = Transformer.new(object)
     converted = transformer.process(root_node)

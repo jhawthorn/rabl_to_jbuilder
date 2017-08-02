@@ -38,8 +38,7 @@ module RablToJbuilder
   class ChildTransformer < Base
     def rewrite_iter(exp)
       if exp[1][0..2] == s(:call, nil, :child)
-        child = exp[1]
-        block = exp[3]
+        _, child, _, block = exp
 
         key, attribute = nil, nil
 
@@ -47,10 +46,13 @@ module RablToJbuilder
           key = child[3][1]
           attribute = s(:call, @object, key)
         elsif child[3][0] == :hash
-          _, attribute, key = child[3][1]
+          _, attribute, key = child[3]
           if attribute[0] == :lit
             attribute = s(:call, @object, attribute[1])
           end
+
+          raise unless key[0] == :lit
+          key = key[1]
         else
           raise "wtf"
         end
@@ -89,7 +91,7 @@ module RablToJbuilder
         block = exp[3]
 
         if args[0] == :args
-          block = block.gsub(s(:lvar, :post), @object)
+          block = block.gsub(s(:lvar, args[1]), @object)
         elsif args == 0
         else
           raise "wat?"

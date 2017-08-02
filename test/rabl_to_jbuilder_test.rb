@@ -55,6 +55,40 @@ class RablToJbuilderTest < Minitest::Test
       end
     RABL
 
-    puts convert(rabl)
+    expected = <<~JBUILDER
+      json.content { format_content(@message.content) }
+      json.(@message, :created_at, :updated_at)
+      json.author do
+        json.name { @message.creator.name.familiar }
+        json.email_address { @message.creator.email_address_with_name }
+        json.url { url_for(@message.creator, :format => :json) }
+      end
+      json.visitors { calculate_visitors(@message) } if current_user.admin?
+      json.comments(@message.comments) do |comment|
+        json.(comment, :content, :created_at)
+      end
+      json.attachments(@message.attachments) do |attachment|
+        json.(attachment, :filename)
+        json.url { url_for(attachment) }
+      end
+    JBUILDER
+
+    assert_equal expected.strip, convert(rabl).strip
+  end
+
+  def test_child_hash_both_symbols
+    rabl = <<~RABL
+      object @post
+
+      child :user => :author do
+        attributes :name
+      end
+    RABL
+
+    expected = <<~JBUILDER
+      json.author { json.(@post.user, :name) }
+    JBUILDER
+
+    assert_equal expected.strip, convert(rabl).strip
   end
 end
