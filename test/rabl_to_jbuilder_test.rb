@@ -91,4 +91,18 @@ class RablToJbuilderTest < Minitest::Test
 
     assert_equal expected.strip, convert(rabl).strip
   end
+
+  def test_attribute
+    rabl = <<~RABL
+      object @post
+
+      attribute :title
+    RABL
+
+    expected = <<~JBUILDER
+      json.(@post, :title)
+    JBUILDER
+
+    assert_equal expected.strip, convert(rabl).strip
+  end
 end

@@ -112,7 +112,7 @@ module RablToJbuilder
 
       if meth == :object
         empty
-      elsif meth == :attributes
+      elsif meth == :attributes || meth == :attribute
         raise "called attributes before declaring `object` or `collection`" unless @object
         s(:call, json, nil, @object, *args)
       elsif meth == :node
