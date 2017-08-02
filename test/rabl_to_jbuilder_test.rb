@@ -9,6 +9,14 @@ class RablToJbuilderTest < Minitest::Test
     RablToJbuilder.convert(rabl)
   end
 
+  def test_empty
+    assert_equal "", convert("")
+  end
+
+  def test_no_rabl
+    assert_equal "yolo", convert("yolo")
+  end
+
   def test_convert_simple_rabl
     rabl = <<~RABL
       #foo
