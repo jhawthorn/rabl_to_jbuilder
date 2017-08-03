@@ -33,7 +33,7 @@ class RablToJbuilderTest < Minitest::Test
     expected = <<~JBUILDER
       json.(@post, :id, :title, :subject)
       json.user { json.(@post.user, :full_name) }
-      json.read { @post.read_by?(@user) }
+      json.read(@post.read_by?(@user))
     JBUILDER
 
     assert_equal expected.strip, convert(rabl).strip
@@ -68,20 +68,20 @@ class RablToJbuilderTest < Minitest::Test
     RABL
 
     expected = <<~JBUILDER
-      json.content { format_content(@message.content) }
+      json.content(format_content(@message.content))
       json.(@message, :created_at, :updated_at)
       json.author do
-        json.name @message.creator.name.familiar
-        json.email_address @message.creator.email_address_with_name
-        json.url url_for(@message.creator, :format => :json)
+        json.name(@message.creator.name.familiar)
+        json.email_address(@message.creator.email_address_with_name)
+        json.url(url_for(@message.creator, :format => :json))
       end
-      json.visitors calculate_visitors(@message) if current_user.admin?
+      json.visitors(calculate_visitors(@message)) if current_user.admin?
       json.comments(@message.comments) do |comment|
         json.(comment, :content, :created_at)
       end
       json.attachments(@message.attachments) do |attachment|
         json.(attachment, :filename)
-        json.url url_for(attachment)
+        json.url(url_for(attachment))
       end
     JBUILDER
 

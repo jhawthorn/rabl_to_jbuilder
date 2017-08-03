@@ -97,7 +97,7 @@ module RablToJbuilder
           raise "wat?"
         end
 
-        s(:iter, s(:call, json, node[3][1]), 0, block)
+        s(:call, json, node[3][1], block)
       else
         exp
       end
