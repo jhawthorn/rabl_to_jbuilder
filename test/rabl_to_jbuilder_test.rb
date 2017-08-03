@@ -6,7 +6,7 @@ class RablToJbuilderTest < Minitest::Test
   end
 
   def convert(rabl)
-    RablToJbuilder.convert(rabl)
+    RablToJbuilder.convert(rabl).strip
   end
 
   def test_empty
@@ -19,6 +19,14 @@ class RablToJbuilderTest < Minitest::Test
 
   def test_extends
     assert_equal %q{json.partial!("foo/bar")}, convert(%q{extends "foo/bar"})
+  end
+
+  def test_extends_passes_object
+    rabl = <<~RABL
+      object @foo
+      extends "foo/bar"
+    RABL
+    assert_equal %q{json.partial!("foo/bar", :bar => (@foo))}, convert(rabl)
   end
 
   def test_convert_simple_rabl

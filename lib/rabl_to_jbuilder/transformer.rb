@@ -116,7 +116,17 @@ module RablToJbuilder
         raise "called attributes before declaring `object` or `collection`" unless @object
         s(:call, json, nil, @object, *args)
       elsif meth == :extends
-        s(:call, json, :partial!, args[0])
+        if @object
+          raise "extends must take a string" unless args[0][0] == :str
+          template = args[0][1]
+          variable = File.basename(args[0][1])
+
+          locals_hash = s(:hash, s(:lit, variable.to_sym), @object)
+
+          s(:call, json, :partial!, args[0], locals_hash)
+        else
+          s(:call, json, :partial!, args[0])
+        end
       else
         exp
       end
