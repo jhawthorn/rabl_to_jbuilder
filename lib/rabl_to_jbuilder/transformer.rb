@@ -119,7 +119,7 @@ module RablToJbuilder
         if @object
           raise "extends must take a string" unless args[0][0] == :str
           template = args[0][1]
-          variable = File.basename(args[0][1])
+          variable = File.basename(File.dirname(args[0][1])).singularize
 
           locals_hash = s(:hash, s(:lit, variable.to_sym), @object)
 
