@@ -159,4 +159,20 @@ class RablToJbuilderTest < Minitest::Test
 
     assert_equal expected.strip, convert(rabl).strip
   end
+
+  def test_dynamic_node
+    rabl = <<~RABL
+      object @foo
+
+      node @foo.bar do |foo|
+        foo.baz
+      end
+    RABL
+
+    expected = <<~JBUILDER
+      json.set!(@foo.bar, @foo.baz)
+    JBUILDER
+
+    assert_equal expected.strip, convert(rabl).strip
+  end
 end

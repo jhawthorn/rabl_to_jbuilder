@@ -108,7 +108,12 @@ module RablToJbuilder
           raise "wat?"
         end
 
-        s(:call, json, node[3][1], block)
+        key = node[3]
+        if key[0] == :lit
+          s(:call, json, key[1], block)
+        else
+          s(:call, json, :set!, key, block)
+        end
       else
         exp
       end
