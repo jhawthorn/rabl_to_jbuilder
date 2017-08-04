@@ -75,6 +75,12 @@ module RablToJbuilder
 
           s(:iter, s(:call, json, key), args, block)
         end
+      elsif call[0..2] == s(:call, nil, :glue)
+        raise unless call[3][0] == :lit
+        attribute = call[3][1]
+        object = s(:call, @object, attribute)
+        block = Transformer.new(object).process(block)
+        block
       else
         s(:iter, call, args, block)
       end
@@ -117,9 +123,13 @@ module RablToJbuilder
 
       if meth == :object
         empty
-      elsif meth == :attributes || meth == :attribute
+      elsif meth == :attributes
         raise "called attributes before declaring `object` or `collection`" unless @object
         s(:call, json, nil, @object, *args)
+      elsif meth == :attribute
+        raise "called attributes before declaring `object` or `collection`" unless @object
+        # FIXME: options hash and conditions
+        s(:call, json, args[0][1], s(:call, @object, args[0][1]))
       elsif meth == :extends
         if @object
           raise "extends must take a string" unless args[0][0] == :str

@@ -120,7 +120,7 @@ class RablToJbuilderTest < Minitest::Test
     RABL
 
     expected = <<~JBUILDER
-      json.(@post, :title)
+      json.title(@post.title)
     JBUILDER
 
     assert_equal expected.strip, convert(rabl).strip
@@ -144,4 +144,19 @@ class RablToJbuilderTest < Minitest::Test
     assert_equal expected.strip, convert(rabl).strip
   end
 
+  def test_glue
+    rabl = <<~RABL
+      object @foo
+
+      glue :bar do
+        attribute :baz
+      end
+    RABL
+
+    expected = <<~JBUILDER
+      json.baz(@foo.bar.baz)
+    JBUILDER
+
+    assert_equal expected.strip, convert(rabl).strip
+  end
 end
