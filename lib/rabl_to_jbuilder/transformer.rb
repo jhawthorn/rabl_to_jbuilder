@@ -36,9 +36,14 @@ module RablToJbuilder
   end
 
   class ChildTransformer < Base
-    def rewrite_iter(exp)
-      if exp[1][0..2] == s(:call, nil, :child)
-        _, child, _, block = exp
+    def process_iter(exp)
+      exp.shift # :iter
+      call = exp.shift
+      args = exp.shift
+      block = exp.shift
+
+      if call[0..2] == s(:call, nil, :child)
+        child = call
 
         key, attribute = nil, nil
 
@@ -71,7 +76,7 @@ module RablToJbuilder
           s(:iter, s(:call, json, key), args, block)
         end
       else
-        exp
+        s(:iter, call, args, block)
       end
     end
 

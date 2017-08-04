@@ -125,4 +125,23 @@ class RablToJbuilderTest < Minitest::Test
 
     assert_equal expected.strip, convert(rabl).strip
   end
+
+  def test_nested_child
+    rabl = <<~RABL
+      object @foo
+
+      child :bar do
+        child :baz do
+          attributes :quux
+        end
+      end
+    RABL
+
+    expected = <<~JBUILDER
+      json.bar { json.baz { json.(@foo.bar.baz, :quux) } }
+    JBUILDER
+
+    assert_equal expected.strip, convert(rabl).strip
+  end
+
 end
