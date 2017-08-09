@@ -126,7 +126,7 @@ module RablToJbuilder
 
       return exp unless target.nil?
 
-      if meth == :object
+      if meth == :object || meth == :collection
         empty
       elsif meth == :attributes
         raise "called attributes before declaring `object` or `collection`" unless @object
