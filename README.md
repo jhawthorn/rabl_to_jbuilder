@@ -23,6 +23,11 @@ rabl_to_jbuilder app/views/api/orders/show.rabl
 RABL has more implicitness than JBuilder, so some behaviour can't be inferred.
 rabl_to_jbuilder will serve as a good first pass but will usually require some manual editing.
 
+**Partials**
+
+RABL allows using any template as a partial. JBuilder expects partials to start with an `_` (like all Rails partials).
+rabl_to_jbuilder doesn't figure out which templates should be partials and assumed everything is a top-level view. Manual renaming is required for now.
+
 **Undefined/Missing data**
 
 Rabl will ignore any nil data.
