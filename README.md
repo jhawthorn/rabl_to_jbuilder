@@ -22,7 +22,15 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+rabl_to_jbuilder app/views/api/
+```
+
+or
+
+```
+rabl_to_jbuilder app/views/api/orders/show.rabl
+```
 
 ## Development
 
