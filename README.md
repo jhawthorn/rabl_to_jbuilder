@@ -32,8 +32,7 @@ rabl_to_jbuilder makes no attempt to replicate this. You'll have to add `if`s or
 
 **Object name**
 
-RABL has an implicit object. rabl_to_jbuilder guesses at a name using the name of the directory the RABL template is in.
-
+RABL has an implicit object. rabl_to_jbuilder guesses at a name using the name of the directory the RABL template is in. Similarly, the object name is guessed when rendering a partial.
 
 ## Development
 
